@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import './pageCSS/carousel.css'; // Make sure to create this CSS file
 
 const data = [
-  { name: 'Mohit Kumar Gupta', img: '/projectFriends/mohit.jpg', review: 'PG-DAC' },
-  { name: 'Akash Bhosale', img: '/projectFriends/akash.jpg', review: 'PG-DAC' },
-  { name: 'Vishal Nalawade', img: '/projectFriends/vishal.jpg', review: 'PG-DAC' },
-  { name: 'Deepak Yadav', img: '/projectFriends/deepak.jpg', review: 'PG-DAC' },
-  { name: 'Akanksha Nandanwar', img: '/projectFriends/akanksha.jpg', review: 'PG-DAC' },
-  { name: 'Vaishnavi', img: '/projectFriends/vaishnavi.jpg', review: 'PG-DAC' }
+  { name: 'Mohit Kumar Gupta', img: '/projectFriends/mohit.jpg', review: 'PG-DAC',Email:"mg97274@gmail.com" },
+  { name: 'Akash Bhosale', img: '/projectFriends/akash.jpg', review: 'PG-DAC' ,Email:"akashhbhosale@gmail.com"},
+  { name: 'Vishal Nalawade', img: '/projectFriends/vishal.jpg', review: 'PG-DAC',Email:"vishalnalawade9699@gmail.com" },
+  { name: 'Deepak Yadav', img: '/projectFriends/deepak.jpg', review: 'PG-DAC',Email:"deepakazm2810@gmail.com" },
+  { name: 'Akanksha Nandanwar', img: '/projectFriends/akanksha.jpg', review: 'PG-DAC', Email:"arnandanwar18@gmail.com"},
+  { name: 'Vaishnavi', img: '/projectFriends/vaishnavi.jpg', review: 'PG-DAC',Email:"vaishnaviparhad@gmail.com" }
 ];
 
 function Contact() {
@@ -30,6 +30,7 @@ function Contact() {
           <div className='carousel-content'>
             <p className='carousel-name'>{data[currentIndex].name}</p>
             <p className='carousel-review'>{data[currentIndex].review}</p>
+            <p className='carousel-review'>{data[currentIndex].Email}</p>
           </div>
         </div>
       </div>

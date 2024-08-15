@@ -3,6 +3,7 @@ package com.app.entity;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 @Embeddable
@@ -12,7 +13,7 @@ public class Address {
 	private String city;
 
 	@NotBlank
-	@Size(min = 6, message = "Pincode must be at least 6 characters long")
+	@Pattern(regexp = "\\d{6}", message = "pincode must be exactly 6 digits")
 	private int pincode;
 
 	@NotBlank

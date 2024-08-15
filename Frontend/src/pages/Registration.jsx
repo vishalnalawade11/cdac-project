@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import './pageCSS/register.css'; // Ensure this path is correct
 import { MdAppRegistration } from "react-icons/md";
+
 const Registration = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -17,7 +18,7 @@ const Registration = () => {
     }
   });
 
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
 
   const handleChange = (e) => {
@@ -35,14 +36,43 @@ const Registration = () => {
     }
   };
 
+  const validateForm = () => {
+    let formErrors = {};
+    if (!formData.name.trim()) formErrors.name = "Name is required";
+    if (!formData.email) formErrors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) formErrors.email = "Email is invalid";
+    if (!formData.contactNumber) formErrors.contactNumber = "Contact number is required";
+    else if (!/^\d{10}$/.test(formData.contactNumber)) formErrors.contactNumber = "Contact number must be exactly 10 digits";
+    if (!formData.role) formErrors.role = "Role is required";
+    if (!formData.aadharNumber) formErrors.aadharNumber = "Aadhar number is required";
+    else if (!/^\d{12}$/.test(formData.aadharNumber)) formErrors.aadharNumber = "Aadhar number must be exactly 12 digits";
+    if (!formData.password) formErrors.password = "Password is required";
+    else if (formData.password.length < 6) formErrors.password = "Password must be at least 6 characters long";
+    if (!formData.address.city.trim()) formErrors.city = "City is required";
+    if (!formData.address.pincode) formErrors.pincode = "Pincode is required";
+    else if (!/^\d{6}$/.test(formData.address.pincode)) formErrors.pincode = "Pincode must be exactly 6 digits";
+    if (!formData.address.state.trim()) formErrors.state = "State is required";
+
+    return formErrors;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const formErrors = validateForm();
+    if (Object.keys(formErrors).length > 0) {
+      setErrors(formErrors);
+      return;
+    }
     try {
       const response = await axios.post('http://localhost:8080/api/user', formData);
       setSuccessMessage('Registration successful!');
-      setError('');
+      setErrors({});
     } catch (error) {
-      setError('Registration failed. Please try again.');
+      if (error.response && error.response.data) {
+        setErrors(error.response.data.errors);
+      } else {
+        setErrors({ submit: 'Registration failed. Please try again.' });
+      }
       setSuccessMessage('');
     }
   };
@@ -61,14 +91,13 @@ const Registration = () => {
         state: ''
       }
     });
-    setError('');
+    setErrors({});
     setSuccessMessage('');
   };
 
   return (
     <div className="register-container">
-     <h2> <MdAppRegistration/>Register</h2>
-
+      <h2><MdAppRegistration />Register</h2>
       <form onSubmit={handleSubmit}>
         <div>
           <label>Name:</label>
@@ -79,6 +108,7 @@ const Registration = () => {
             placeholder='Enter Name'
             onChange={handleChange}
           />
+          {errors.name && <p className="error-message">{errors.name}</p>}
         </div>
         <div>
           <label>Email:</label>
@@ -89,6 +119,7 @@ const Registration = () => {
             placeholder='Enter Email'
             onChange={handleChange}
           />
+          {errors.email && <p className="error-message">{errors.email}</p>}
         </div>
         <div>
           <label>Contact Number:</label>
@@ -99,6 +130,7 @@ const Registration = () => {
             placeholder='Enter Contact Number'
             onChange={handleChange}
           />
+          {errors.contactNumber && <p className="error-message">{errors.contactNumber}</p>}
         </div>
         <div>
           <label>Role:</label>
@@ -108,8 +140,8 @@ const Registration = () => {
             <option value="EMPLOYEE">EMPLOYEE</option>
             <option value="FARMER">FARMER</option>
             <option value="ACCOUNTANT">ACCOUNTANT</option>
-            <option value="ADMIN">Admin</option>
           </select>
+          {errors.role && <p className="error-message">{errors.role}</p>}
         </div>
         <div>
           <label>Aadhar Number:</label>
@@ -120,6 +152,7 @@ const Registration = () => {
             placeholder='Enter Aadhar Number'
             onChange={handleChange}
           />
+          {errors.aadharNumber && <p className="error-message">{errors.aadharNumber}</p>}
         </div>
         <div>
           <label>Password:</label>
@@ -130,6 +163,7 @@ const Registration = () => {
             placeholder='Enter Password'
             onChange={handleChange}
           />
+          {errors.password && <p className="error-message">{errors.password}</p>}
         </div>
         <div>
           <label>City Name:</label>
@@ -140,6 +174,7 @@ const Registration = () => {
             placeholder='Enter City Name'
             onChange={handleChange}
           />
+          {errors.city && <p className="error-message">{errors.city}</p>}
         </div>
         <div>
           <label>Pincode:</label>
@@ -150,6 +185,7 @@ const Registration = () => {
             placeholder='Enter Pincode'
             onChange={handleChange}
           />
+          {errors.pincode && <p className="error-message">{errors.pincode}</p>}
         </div>
         <div>
           <label>State:</label>
@@ -160,11 +196,12 @@ const Registration = () => {
             placeholder='Enter State'
             onChange={handleChange}
           />
+          {errors.state && <p className="error-message">{errors.state}</p>}
         </div>
         <button type="submit">Submit</button>
         <button type="button" onClick={handleReset}>Reset</button>
       </form>
-      {error && <p className="error-message">{error}</p>}
+      {errors.submit && <p className="error-message">{errors.submit}</p>}
       {successMessage && <p className="success-message">{successMessage}</p>}
     </div>
   );

@@ -27,6 +27,10 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private ModelMapper mapper;
 
+	
+	
+	
+	
 	@Override
 	public UserDto registerUser(UserDto userDto) {
 		// convert Dto to entity
@@ -35,6 +39,8 @@ public class UserServiceImpl implements UserService {
 		return mapper.map(savedUser, UserDto.class);
 	}
 
+	
+	
 	@Override
 	public UserDto login(String email, String aadharNumber, String password) {
 		User user = null;
@@ -53,6 +59,8 @@ public class UserServiceImpl implements UserService {
 		return mapper.map(user, UserDto.class);
 	}
 
+	
+	
 	@Override
 	public List<UserDto> getUsersByRole(Role role) {
 		List<User> users = userRepo.findByRole(role);
@@ -97,5 +105,9 @@ public class UserServiceImpl implements UserService {
 	    }
 	    return mapper.map(user, UserDto.class);
 	}
+	
+	
+	
+	
 	
 }
