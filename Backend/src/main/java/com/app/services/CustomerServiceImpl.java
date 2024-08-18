@@ -78,10 +78,8 @@ public class CustomerServiceImpl implements CustomerService {
 
 	public List<SalesDto> getSalesByDate(LocalDate date) {
 		List<Sales> selling = salesRepo.findBySellingDate(date);
-		System.out.println("Selling details fetched: " + selling);
 		return selling.stream().map(Sales -> {
 			SalesDto dto = mapper.map(Sales, SalesDto.class);
-			System.out.println("Mapped DTO: " + dto);
 			return dto;
 		}).collect(Collectors.toList());
 	}

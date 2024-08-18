@@ -7,12 +7,14 @@ import javax.transaction.Transactional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.app.dto.UserDto;
 import com.app.dto.UserUpdateDto;
 import com.app.entity.Role;
 import com.app.entity.User;
+import com.app.exception.DuplicateEntryException;
 import com.app.exception.InvalidCredentialsException;
 import com.app.exception.UserNotFoundException;
 import com.app.repositry.UserRepository;
@@ -27,37 +29,61 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private ModelMapper mapper;
 
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 	
 	
-	
-	
+
 	@Override
 	public UserDto registerUser(UserDto userDto) {
-		// convert Dto to entity
-		User user = mapper.map(userDto, User.class);
-		User savedUser = userRepo.save(user);
-		return mapper.map(savedUser, UserDto.class);
+	    try {
+	        // Convert DTO to entity
+	        User user = mapper.map(userDto, User.class);
+
+	        // Encrypt the password before saving
+	        String encodedPassword = passwordEncoder.encode(userDto.getPassword());
+	        user.setPassword(encodedPassword);
+	        
+	        if(userRepo.findByAadharNumber(user.getAadharNumber()) != null) {
+	        	throw new DuplicateEntryException("User with " + user.getAadharNumber() + " already exists");
+	        }
+
+	        // Save user to repository
+	        User savedUser = userRepo.save(user);
+
+	        // Map saved user to DTO and return
+	        return mapper.map(savedUser, UserDto.class);
+	    } catch (Exception e) {
+	        // Log the stack trace for better debugging
+	        e.printStackTrace();
+	        throw new RuntimeException("User registration failed: " + e.getMessage(), e);
+	    }
 	}
+
 
 	
 	
+
 	@Override
 	public UserDto login(String email, String aadharNumber, String password) {
-		User user = null;
+	    User user = null;
 
-		if (email != null && !email.isEmpty()) {
-			user = userRepo.findByEmailAndPassword(email, password);
-		} else if (aadharNumber != null && !aadharNumber.isEmpty()) {
-			user = userRepo.findByAadharNumberAndPassword(aadharNumber, password);
-		}
+	    // Find user by email or Aadhar number
+	    if (email != null && !email.isEmpty()) {
+	        user = userRepo.findByEmail(email);
+	    } else if (aadharNumber != null && !aadharNumber.isEmpty()) {
+	        user = userRepo.findByAadharNumber(aadharNumber);
+	    }
 
-		if (user == null) {
-			throw new InvalidCredentialsException("Invalid email/Aadhar number or password.");
-		}
+	    // Check if user exists and validate password
+	    if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
+	        throw new InvalidCredentialsException("Invalid email/Aadhar number or password.");
+	    }
 
-		// Map to DTO if needed
-		return mapper.map(user, UserDto.class);
+	    // Map to DTO
+	    return mapper.map(user, UserDto.class);
 	}
+
 
 	
 	
@@ -78,7 +104,8 @@ public class UserServiceImpl implements UserService {
 		// Update user details
 		existingUser.setName(userDto.getName());
 		existingUser.setEmail(userDto.getEmail());
-		existingUser.setPassword(userDto.getPassword());
+		//Encrypt the updated passeord before saving
+		existingUser.setPassword(passwordEncoder.encode(userDto.getPassword()));
 		existingUser.setContactNumber(userDto.getContactNumber());
 	
 

@@ -246,18 +246,18 @@
 
   
   .reg-cont .success-message {
-    color: rgb(221, 226, 221);
+    color: snow;
     margin-top: 10px;
   }
 
   .reg-farm .success-message {
-    color: rgb(246, 249, 246);
+    color: snow;
     margin-top: 10px;
   }
 
 
   .reg-salary .success-message {
-    color: rgb(244, 248, 244);
+    color: snow;
     margin-top: 10px;
   }
   

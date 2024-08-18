@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.app.dto.CustomerDto;
 import com.app.dto.SalesDto;
 import com.app.exception.AadharNumberNotFound;
+import com.app.exception.DuplicateEntryException;
 import com.app.services.CustomerServiceImpl;
 
 @RestController
@@ -29,8 +30,12 @@ public class CustomerController {
 
 	@PostMapping("/add")
 	public ResponseEntity<?> addCustomer(@RequestBody CustomerDto customerDto) {
-		CustomerDto customer = custdetailsServices.addCustomer(customerDto);
-		return ResponseEntity.status(HttpStatus.CREATED).body(customer);
+		try {
+			CustomerDto customer = custdetailsServices.addCustomer(customerDto);
+			return ResponseEntity.status(HttpStatus.CREATED).body(customer);
+		} catch (DuplicateEntryException e) {
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+		}
 	}
 
 	@PostMapping("/add_sales")
@@ -63,13 +68,11 @@ public class CustomerController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
 	}
-	
-	
-	
+
 	@PutMapping("/update/{aadharNumber}")
 	public ResponseEntity<?> updateCustomer(@PathVariable String aadharNumber, @RequestBody CustomerDto customerDto) {
 		try {
-			CustomerDto updatedCustomer =custdetailsServices.updateCustomer(aadharNumber, customerDto);
+			CustomerDto updatedCustomer = custdetailsServices.updateCustomer(aadharNumber, customerDto);
 			return ResponseEntity.ok(updatedCustomer);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -85,6 +88,5 @@ public class CustomerController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}
 	}
-
 
 }
